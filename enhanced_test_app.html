@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Web Scraping & AI Enrichment</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+        .card h2 {
+            margin: 0 0 20px 0;
+            color: #495057;
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        .result-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #495057;
+            margin: 0;
+        }
+        .result-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .result-status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .result-status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .result-status.not-found {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .result-description {
+            color: #6c757d;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        .spec-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .spec-value {
+            color: #6c757d;
+        }
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .specs-table th, .specs-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .specs-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
+        }
+        .part-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .part-info {
+            flex: 1;
+        }
+        .part-title {
+            font-weight: 600;
+            color: #495057;
+            margin: 0 0 5px 0;
+        }
+        .part-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .part-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Enhanced Web Scraping & AI Enrichment</h1>
+            <p>Extract comprehensive data from manufacturer websites like Festo, SMC, Siemens</p>
+        </div>
+
+        <div class="content">
+            <div class="grid">
+                <!-- Input Section -->
+                <div class="card">
+                    <h2>📝 Add Parts to Scrape</h2>
+                    
+                    <div class="form-group">
+                        <label>Manufacturer *</label>
+                        <input type="text" id="manufacturer" placeholder="e.g., Festo, SMC, Siemens" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Part ID *</label>
+                        <input type="text" id="partId" placeholder="e.g., DSBC-63-400-PPVA-N3" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="description" rows="3" placeholder="Detailed description of the part"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Vendor (Optional)</label>
+                        <input type="text" id="vendor" placeholder="Vendor name if different from manufacturer" />
+                    </div>
+                    
+                    <button class="btn" onclick="addPart()">+ Add Part</button>
+                    <button class="btn btn-secondary" onclick="loadSampleData()">Load Sample Data</button>
+                    <button class="btn btn-danger" onclick="clearStorage()">Clear All Data</button>
+                </div>
+
+                <!-- Statistics Section -->
+                <div class="card">
+                    <h2>📊 Scraping Statistics</h2>
+                    <div id="statistics">
+                        <div class="spec-item">
+                            <span class="spec-label">Total Parts:</span>
+                            <span class="spec-value" id="totalParts">0</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Successful:</span>
+                            <span class="spec-value" id="successfulParts">0</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Failed:</span>
+                            <span class="spec-value" id="failedParts">0</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Not Found:</span>
+                            <span class="spec-value" id="notFoundParts">0</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-success" onclick="startScraping()" id="scrapeBtn">▷ Start Scraping</button>
+                        <button class="btn btn-secondary" onclick="exportData()" id="exportBtn" disabled>⬇ Export Results</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Added Parts -->
+            <div id="addedPartsSection" class="hidden">
+                <h2>📦 Added Parts</h2>
+                <div id="addedParts"></div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Scraping manufacturer websites...</p>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsSection" class="hidden">
+                <h2>📋 Detailed Scraping Results</h2>
+                <div id="resultsContainer" class="results-grid"></div>
+            </div>
+
+            <!-- Status Messages -->
+            <div id="statusMessages"></div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = "http://localhost:8000";
+        let parts = [];
+        let lastResults = [];
+
+        // Load data from localStorage on page load
+        function loadFromStorage() {
+            try {
+                const savedParts = localStorage.getItem('scrapingParts');
+                const savedResults = localStorage.getItem('scrapingResults');
+                
+                if (savedParts) {
+                    parts = JSON.parse(savedParts);
+                    updatePartsDisplay();
+                }
+                if (savedResults) {
+                    lastResults = JSON.parse(savedResults);
+                    displayResults(lastResults);
+                }
+            } catch (e) {
+                console.error('Error loading from storage:', e);
+            }
+        }
+
+        // Save data to localStorage
+        function saveToStorage() {
+            try {
+                localStorage.setItem('scrapingParts', JSON.stringify(parts));
+                localStorage.setItem('scrapingResults', JSON.stringify(lastResults));
+            } catch (e) {
+                console.error('Error saving to storage:', e);
+            }
+        }
+
+        // Clear all data from localStorage
+        function clearStorage() {
+            localStorage.removeItem('scrapingParts');
+            localStorage.removeItem('scrapingResults');
+            parts = [];
+            lastResults = [];
+            updatePartsDisplay();
+            document.getElementById('resultsSection').classList.add('hidden');
+        }
+
+        function addPart() {
+            const manufacturer = document.getElementById('manufacturer').value.trim();
+            const partId = document.getElementById('partId').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const vendor = document.getElementById('vendor').value.trim();
+
+            if (!manufacturer || !partId) {
+                showStatus('Please fill in manufacturer and part ID', 'error');
+                return;
+            }
+
+            const part = {
+                manufacturer,
+                part_id: partId,
+                description,
+                vendor: vendor || null
+            };
+
+            parts.push(part);
+            updatePartsDisplay();
+            saveToStorage();
+            clearForm();
+            showStatus(`Added ${manufacturer} ${partId}`, 'success');
+        }
+
+        function clearForm() {
+            document.getElementById('manufacturer').value = '';
+            document.getElementById('partId').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('vendor').value = '';
+        }
+
+        function updatePartsDisplay() {
+            const container = document.getElementById('addedParts');
+            const section = document.getElementById('addedPartsSection');
+            
+            if (parts.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            container.innerHTML = '';
+
+            parts.forEach((part, index) => {
+                const partDiv = document.createElement('div');
+                partDiv.className = 'part-item';
+                partDiv.innerHTML = `
+                    <div class="part-info">
+                        <div class="part-title">${part.manufacturer} - ${part.part_id}</div>
+                        <div class="part-description">${part.description}</div>
+                    </div>
+                    <div class="part-actions">
+                        <button class="btn btn-danger btn-sm" onclick="removePart(${index})">🗑️ Remove</button>
+                    </div>
+                `;
+                container.appendChild(partDiv);
+            });
+
+            updateStatistics();
+        }
+
+        function removePart(index) {
+            parts.splice(index, 1);
+            updatePartsDisplay();
+            saveToStorage();
+        }
+
+        function loadSampleData() {
+            parts = [
+                {
+                    manufacturer: "Festo",
+                    part_id: "DSBC-63-400-PPVA-N3",
+                    description: "ISO cylinder, double-acting, bore 63mm, stroke 400mm",
+                    vendor: "Festo"
+                },
+                {
+                    manufacturer: "Siemens",
+                    part_id: "6ES7-321-1BL00-0AA0",
+                    description: "PLC module, 16 digital inputs, 24V DC, Profinet communication",
+                    vendor: "Siemens"
+                },
+                {
+                    manufacturer: "SMC",
+                    part_id: "CM2-32-100",
+                    description: "Pneumatic cylinder, double-acting, bore 32mm, stroke 100mm",
+                    vendor: "SMC"
+                }
+            ];
+            updatePartsDisplay();
+            saveToStorage();
+            showStatus('Loaded sample data', 'success');
+        }
+
+        function updateStatistics() {
+            document.getElementById('totalParts').textContent = parts.length;
+            document.getElementById('successfulParts').textContent = lastResults.filter(r => r.status === 'success').length;
+            document.getElementById('failedParts').textContent = lastResults.filter(r => r.status === 'error').length;
+            document.getElementById('notFoundParts').textContent = lastResults.filter(r => r.status === 'not_found').length;
+        }
+
+        async function startScraping() {
+            if (parts.length === 0) {
+                showStatus('Please add parts to scrape', 'error');
+                return;
+            }
+
+            const scrapeBtn = document.getElementById('scrapeBtn');
+            const loading = document.getElementById('loading');
+            const resultsSection = document.getElementById('resultsSection');
+
+            scrapeBtn.disabled = true;
+            loading.style.display = 'block';
+            resultsSection.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${BASE_URL}/scrape-parts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        parts: parts,
+                        enrichment_prompt: "Extract technical specifications, pricing, and availability information"
+                    })
+                });
+
+                const data = await response.json();
+                lastResults = data.results;
+                saveToStorage();
+
+                if (data.success) {
+                    showStatus(`Scraping completed: ${data.successful} successful, ${data.failed} failed, ${data.not_found} not found`, 'success');
+                    displayResults(data.results);
+                    document.getElementById('exportBtn').disabled = false;
+                } else {
+                    showStatus(`Scraping failed: ${data.detail || 'Unknown error'}`, 'error');
+                }
+
+                updateStatistics();
+
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                scrapeBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('resultsContainer');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            container.innerHTML = '';
+            resultsSection.classList.remove('hidden');
+
+            results.forEach((result, index) => {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                resultCard.style.cursor = 'pointer';
+                resultCard.onclick = () => showDetailedView(result, index);
+                
+                const statusClass = result.status === 'success' ? 'success' : 
+                                  result.status === 'error' ? 'error' : 'not-found';
+                
+                let extractedInfo = {};
+                if (result.scraped_data && result.scraped_data.extracted_info) {
+                    extractedInfo = result.scraped_data.extracted_info;
+                }
+
+                // Count scraped fields
+                const scrapedFields = Object.values(extractedInfo).filter(value => value && value !== 'N/A' && value !== '').length;
+
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <h3 class="result-title">${result.manufacturer} - ${result.part_id}</h3>
+                        <span class="result-status ${statusClass}">${result.status}</span>
+                    </div>
+                    
+                    <div class="result-description">${result.description}</div>
+                    
+                    <div style="margin-top: 15px; color: #6c757d; font-size: 0.9rem;">
+                        ${result.status === 'success' ? `Scraped ${scrapedFields} fields` : 
+                          result.status === 'not_found' ? 'Part not found on manufacturer website' : 
+                          result.status === 'error' ? `Error: ${result.error || 'Unknown error'}` : 
+                          'No data available'}
+                    </div>
+                    
+                    <div style="margin-top: 10px; color: #667eea; font-size: 0.8rem; font-weight: 600;">
+                        👆 Click to view detailed information
+                    </div>
+                `;
+                
+                container.appendChild(resultCard);
+            });
+        }
+
+        function showDetailedView(result, index) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+
+            // Create modal content
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                max-width: 900px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            `;
+
+            const statusClass = result.status === 'success' ? 'success' : 
+                              result.status === 'error' ? 'error' : 'not-found';
+            
+            let extractedInfo = {};
+            if (result.scraped_data && result.scraped_data.extracted_info) {
+                extractedInfo = result.scraped_data.extracted_info;
+            }
+
+            modalContent.innerHTML = `
+                <div style="padding: 30px;">
+                    <!-- Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e9ecef;">
+                        <div>
+                            <h1 style="margin: 0; color: #495057; font-size: 2rem;">${result.manufacturer} - ${result.part_id}</h1>
+                            <p style="margin: 10px 0 0 0; color: #6c757d; font-size: 1.1rem;">${result.description}</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <span class="result-status ${statusClass}" style="font-size: 0.9rem;">${result.status}</span>
+                            <button onclick="this.closest('.modal-overlay').remove()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">✕ Close</button>
+                        </div>
+                    </div>
+
+                    ${result.status === 'success' ? `
+                        <!-- Product Information -->
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="color: #495057; margin-bottom: 20px; font-size: 1.5rem;">📋 Product Information</h2>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                    <h3 style="margin: 0 0 15px 0; color: #495057;">Basic Details</h3>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Product Title:</span>
+                                        <span class="spec-value">${extractedInfo.title || 'N/A'}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Part Number:</span>
+                                        <span class="spec-value">${extractedInfo.part_number || result.part_id}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Manufacturer:</span>
+                                        <span class="spec-value">${result.manufacturer}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Category:</span>
+                                        <span class="spec-value">${extractedInfo.category || 'N/A'}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                    <h3 style="margin: 0 0 15px 0; color: #495057;">Commercial Information</h3>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Price:</span>
+                                        <span class="spec-value">${extractedInfo.price || 'N/A'}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Availability:</span>
+                                        <span class="spec-value">${extractedInfo.availability || 'N/A'}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Warranty:</span>
+                                        <span class="spec-value">${extractedInfo.warranty || 'N/A'}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Vendor:</span>
+                                        <span class="spec-value">${result.vendor || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Specifications -->
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="color: #495057; margin-bottom: 20px; font-size: 1.5rem;">⚙️ Technical Specifications</h2>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                    <h3 style="margin: 0 0 15px 0; color: #495057;">Physical Properties</h3>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Dimensions:</span>
+                                        <span class="spec-value">${extractedInfo.dimensions || 'N/A'}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Weight:</span>
+                                        <span class="spec-value">${extractedInfo.weight || 'N/A'}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Material:</span>
+                                        <span class="spec-value">${extractedInfo.material || 'N/A'}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                    <h3 style="margin: 0 0 15px 0; color: #495057;">Operating Conditions</h3>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Pressure:</span>
+                                        <span class="spec-value">${extractedInfo.pressure || 'N/A'}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Temperature:</span>
+                                        <span class="spec-value">${extractedInfo.temperature || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comprehensive Product Details -->
+                        ${result.scraped_data && result.scraped_data.comprehensive_details ? `
+                        <div style="margin-bottom: 30px;">
+                            <h2 style="color: #495057; margin-bottom: 20px; font-size: 1.5rem;">📊 Comprehensive Product Details</h2>
+                            ${Object.entries(result.scraped_data.comprehensive_details).map(([category, details]) => `
+                                <div style="margin-bottom: 25px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                    <h3 style="margin: 0 0 15px 0; color: #495057; font-size: 1.2rem;">${category}</h3>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                                        ${Object.entries(details).map(([key, value]) => `
+                                            <div class="spec-item">
+                                                <span class="spec-label">${key}:</span>
+                                                <span class="spec-value">${value || 'N/A'}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
+                        ${extractedInfo.specifications ? `
+                            <!-- Detailed Specifications -->
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #495057; margin-bottom: 20px; font-size: 1.5rem;">📊 Detailed Technical Data</h2>
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+                                    <div style="font-family: monospace; font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap;">${extractedInfo.specifications}</div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+
+                        <!-- AI Enrichment -->
+                        ${result.ai_enrichment ? `
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #495057; margin-bottom: 20px; font-size: 1.5rem;">🤖 AI Enrichment</h2>
+                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                                    <div style="font-size: 0.9rem; line-height: 1.6;">
+                                        ${result.ai_enrichment.ai_summary || 'AI analysis completed'}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                    ` : `
+                        <!-- Error/Not Found State -->
+                        <div style="text-align: center; padding: 40px; color: #6c757d;">
+                            <div style="font-size: 3rem; margin-bottom: 20px;">⚠️</div>
+                            <h2 style="color: #495057; margin-bottom: 15px;">${result.status === 'not_found' ? 'Part Not Found' : 'Scraping Error'}</h2>
+                            <p style="font-size: 1.1rem; margin-bottom: 20px;">
+                                ${result.status === 'not_found' ? 
+                                  'This part was not found on the manufacturer website. This could be due to:' :
+                                  'An error occurred while scraping this part:'}
+                            </p>
+                            <ul style="text-align: left; max-width: 500px; margin: 0 auto; line-height: 1.6;">
+                                ${result.status === 'not_found' ? `
+                                    <li>Part number may be incorrect or outdated</li>
+                                    <li>Part may be in a different catalog or region</li>
+                                    <li>Manufacturer website may require authentication</li>
+                                    <li>Website structure may have changed</li>
+                                ` : `
+                                    <li>Network connectivity issues</li>
+                                    <li>Website blocking automated access</li>
+                                    <li>Invalid part number format</li>
+                                    <li>Server timeout or error</li>
+                                `}
+                            </ul>
+                            ${result.error ? `
+                                <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 6px; margin-top: 20px; font-family: monospace; font-size: 0.9rem;">
+                                    Error: ${result.error}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `}
+
+                    <!-- Footer -->
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: center; color: #6c757d; font-size: 0.9rem;">
+                        Scraped on ${new Date().toLocaleString()} | Status: ${result.status}
+                    </div>
+                </div>
+            `;
+
+            modal.className = 'modal-overlay';
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Close on background click
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            };
+        }
+
+        async function exportData() {
+            if (lastResults.length === 0) {
+                showStatus('No data to export', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/export`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        data: lastResults,
+                        format: 'json',
+                        filename: 'scraped_parts'
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'scraped_parts.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showStatus('Data exported successfully!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    showStatus(`Export failed: ${errorData.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Export error: ${error.message}`, 'error');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessages');
+            const statusElement = document.createElement('div');
+            statusElement.className = `status ${type}`;
+            statusElement.textContent = message;
+            statusDiv.appendChild(statusElement);
+            
+            setTimeout(() => {
+                statusElement.remove();
+            }, 5000);
+        }
+
+        // Initialize
+        updateStatistics();
+        // Initialize the application when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromStorage();
+            updatePartsDisplay();
+            updateStatistics();
+        });
+    </script>
+</body>
+</html>

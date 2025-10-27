@@ -1,0 +1,191 @@
+{
+  "info": {
+    "name": "Web Scraping & AI Enrichment API",
+    "description": "Complete API collection for web scraping and AI-powered data enrichment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Root Endpoint",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": ["{{base_url}}"],
+          "path": [""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Scrape URLs",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"urls\": [\n    \"https://example.com\",\n    \"https://httpbin.org/html\"\n  ],\n  \"selectors\": {\n    \"title\": \"h1\",\n    \"content\": \".content\",\n    \"links\": \"a\"\n  },\n  \"template_name\": \"example_template\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/scrape",
+          "host": ["{{base_url}}"],
+          "path": ["scrape"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Enrich Data",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\n    {\n      \"url\": \"https://example.com\",\n      \"title\": \"Example Title\",\n      \"content\": \"Example content here\"\n    }\n  ],\n  \"enrichment_prompt\": \"Extract key insights and categorize this content\",\n  \"ai_model\": \"gpt-3.5-turbo\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/enrich",
+          "host": ["{{base_url}}"],
+          "path": ["enrich"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Export Data - Excel",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\n    {\n      \"url\": \"https://example.com\",\n      \"title\": \"Example Title\",\n      \"content\": \"Example content here\"\n    }\n  ],\n  \"format\": \"excel\",\n  \"filename\": \"scraped_data_export\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/export",
+          "host": ["{{base_url}}"],
+          "path": ["export"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Export Data - JSON",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\n    {\n      \"url\": \"https://example.com\",\n      \"title\": \"Example Title\",\n      \"content\": \"Example content here\"\n    }\n  ],\n  \"format\": \"json\",\n  \"filename\": \"scraped_data_export\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/export",
+          "host": ["{{base_url}}"],
+          "path": ["export"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Templates",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/templates",
+          "host": ["{{base_url}}"],
+          "path": ["templates"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Save Template",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"news_scraper\",\n  \"selectors\": {\n    \"title\": \"h1\",\n    \"content\": \".article-content\",\n    \"author\": \".author\",\n    \"date\": \".publish-date\"\n  },\n  \"description\": \"Template for scraping news articles\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/templates",
+          "host": ["{{base_url}}"],
+          "path": ["templates"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Template by Name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/templates/news_scraper",
+          "host": ["{{base_url}}"],
+          "path": ["templates", "news_scraper"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Statistics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/statistics",
+          "host": ["{{base_url}}"],
+          "path": ["statistics"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+}

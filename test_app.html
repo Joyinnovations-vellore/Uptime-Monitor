@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraping & AI Enrichment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dark { color-scheme: dark; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <div class="min-h-screen p-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    Web Scraping & AI Enrichment
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Enter part information to scrape and enrich data using AI
+                </p>
+            </div>
+
+            <!-- Error Banner (hidden by default) -->
+            <div id="errorBanner" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-medium">Error occurred while scraping parts</span>
+                    </div>
+                    <button onclick="hideError()" class="text-red-500 hover:text-red-700">
+                        ×
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column - Part Information -->
+                <div class="space-y-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                            Part Information
+                        </h2>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Manufacturer Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="manufacturer"
+                                    placeholder="e.g., Festo, SMC, Siemens"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Internal Part ID *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="partId"
+                                    placeholder="e.g., B10099368"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Item Description *
+                                </label>
+                                <textarea
+                                    id="description"
+                                    placeholder="Detailed description of the part"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 h-24 resize-none"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Vendor (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    id="vendor"
+                                    placeholder="Vendor name if different from manufacturer"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                />
+                            </div>
+
+                            <button
+                                onclick="addPart()"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                + Add Part
+                            </button>
+                        </div>
+
+                        <!-- Added Parts -->
+                        <div id="addedParts" class="mt-6 hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-medium text-gray-900 dark:text-white">
+                                    Added Parts (<span id="partCount">0</span>)
+                                </h3>
+                                <button
+                                    onclick="clearAll()"
+                                    class="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                                >
+                                    Clear All
+                                </button>
+                            </div>
+                            <div id="partsList" class="space-y-2">
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-6 space-y-3">
+                            <button
+                                onclick="loadSampleData()"
+                                class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                            >
+                                Load Sample Data
+                            </button>
+
+                            <button
+                                id="startScrapingBtn"
+                                onclick="startScraping()"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                ▷ Start Scraping
+                            </button>
+
+                            <button
+                                id="exportBtn"
+                                onclick="exportToExcel()"
+                                disabled
+                                class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                ⬇ Export Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Statistics and Results -->
+                <div class="space-y-6">
+                    <!-- Statistics -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                            Statistics
+                        </h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div id="totalParts" class="text-2xl font-bold text-gray-900 dark:text-white">0</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Total Parts</div>
+                            </div>
+
+                            <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div id="successfulParts" class="text-2xl font-bold text-gray-900 dark:text-white">0</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Successful</div>
+                            </div>
+
+                            <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div id="failedParts" class="text-2xl font-bold text-gray-900 dark:text-white">0</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Failed</div>
+                            </div>
+
+                            <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div class="text-2xl font-bold text-gray-900 dark:text-white">$0</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Avg Price</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                            Results
+                        </h2>
+                        <div id="resultsContainer">
+                            <div class="text-center py-12">
+                                <div class="text-gray-400 mb-4">📥</div>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    No results yet. Add parts and start scraping to see results here.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let parts = [];
+        let results = [];
+
+        function addPart() {
+            const manufacturer = document.getElementById('manufacturer').value;
+            const partId = document.getElementById('partId').value;
+            const description = document.getElementById('description').value;
+            const vendor = document.getElementById('vendor').value;
+
+            if (!manufacturer || !partId || !description) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const newPart = {
+                id: Date.now(),
+                manufacturer,
+                part_id: partId,
+                description,
+                vendor: vendor || null
+            };
+
+            parts.push(newPart);
+            updatePartsDisplay();
+            clearForm();
+        }
+
+        function removePart(id) {
+            parts = parts.filter(part => part.id !== id);
+            updatePartsDisplay();
+        }
+
+        function clearAll() {
+            parts = [];
+            results = [];
+            updatePartsDisplay();
+            updateResults();
+        }
+
+        function clearForm() {
+            document.getElementById('manufacturer').value = '';
+            document.getElementById('partId').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('vendor').value = '';
+        }
+
+        function loadSampleData() {
+            parts = [{
+                id: Date.now(),
+                manufacturer: 'Festo',
+                part_id: 'B10099368',
+                description: 'Pneumatic cylinder, double-acting, bore 32mm, stroke 100mm',
+                vendor: null
+            }];
+            updatePartsDisplay();
+        }
+
+        function updatePartsDisplay() {
+            const addedPartsDiv = document.getElementById('addedParts');
+            const partsListDiv = document.getElementById('partsList');
+            const partCountSpan = document.getElementById('partCount');
+            const startBtn = document.getElementById('startScrapingBtn');
+
+            partCountSpan.textContent = parts.length;
+            startBtn.disabled = parts.length === 0;
+
+            if (parts.length > 0) {
+                addedPartsDiv.classList.remove('hidden');
+                partsListDiv.innerHTML = parts.map(part => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900 dark:text-white">
+                                ${part.manufacturer} - ${part.part_id}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400 truncate">
+                                ${part.description}
+                            </div>
+                        </div>
+                        <button onclick="removePart(${part.id})" class="p-1 text-red-600 hover:text-red-700 dark:text-red-400">
+                            🗑️
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                addedPartsDiv.classList.add('hidden');
+            }
+        }
+
+        async function startScraping() {
+            if (parts.length === 0) {
+                alert('Please add at least one part');
+                return;
+            }
+
+            const startBtn = document.getElementById('startScrapingBtn');
+            startBtn.disabled = true;
+            startBtn.textContent = 'Scraping...';
+            hideError();
+
+            try {
+                const response = await fetch('http://localhost:8000/scrape-parts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        parts: parts,
+                        enrichment_prompt: 'Extract technical specifications, pricing, and availability information'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    results = data.results;
+                    updateResults();
+                    alert(`Scraping completed: ${data.successful} successful, ${data.failed} failed`);
+                } else {
+                    showError('Scraping failed');
+                }
+            } catch (error) {
+                console.error('Scraping error:', error);
+                showError('An error occurred while scraping parts: ' + error.message);
+            } finally {
+                startBtn.disabled = false;
+                startBtn.textContent = '▷ Start Scraping';
+            }
+        }
+
+        function updateResults() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const exportBtn = document.getElementById('exportBtn');
+            const totalPartsSpan = document.getElementById('totalParts');
+            const successfulSpan = document.getElementById('successfulParts');
+            const failedSpan = document.getElementById('failedParts');
+
+            totalPartsSpan.textContent = parts.length;
+            successfulSpan.textContent = results.filter(r => r.status === 'success').length;
+            failedSpan.textContent = results.filter(r => r.status === 'error').length;
+            exportBtn.disabled = results.length === 0;
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-gray-400 mb-4">📥</div>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            No results yet. Add parts and start scraping to see results here.
+                        </p>
+                    </div>
+                `;
+            } else {
+                resultsContainer.innerHTML = results.map((result, index) => `
+                    <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="font-medium text-gray-900 dark:text-white">
+                                ${result.manufacturer} - ${result.part_id}
+                            </div>
+                            <div class="flex items-center space-x-1 ${result.status === 'success' ? 'text-green-600' : 'text-red-600'}">
+                                <span class="text-sm font-medium capitalize">${result.status}</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            ${result.description}
+                        </div>
+                        ${result.scraped_data && Object.keys(result.scraped_data).length > 0 ? `
+                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-500">
+                                Scraped ${Object.keys(result.scraped_data).length} fields
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function exportToExcel() {
+            if (results.length === 0) {
+                alert('No results to export');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        data: results,
+                        format: 'json',
+                        filename: 'scraped_parts'
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'scraped_parts.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    alert('Data exported successfully');
+                } else {
+                    alert('Export failed');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Export failed: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            const errorBanner = document.getElementById('errorBanner');
+            errorBanner.classList.remove('hidden');
+        }
+
+        function hideError() {
+            const errorBanner = document.getElementById('errorBanner');
+            errorBanner.classList.add('hidden');
+        }
+
+        // Initialize
+        updatePartsDisplay();
+        updateResults();
+    </script>
+</body>
+</html>
